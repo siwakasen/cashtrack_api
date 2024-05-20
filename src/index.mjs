@@ -7,7 +7,6 @@ import session from 'express-session';
 import passport from 'passport';
 import dotenv from 'dotenv';
 import routes from './router/index.mjs';
-import { API_PREFIX } from './utils/constant.mjs';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -44,8 +43,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(loggingMiddleware);
-app.use(`${API_PREFIX}`, routes);
+app.use(`/api`, routes);
 
 app.listen(port, () => {
-    console.log(`listening at ${process.env.BASE_URL}:${port}`);
+    console.log(`listening at ${process.env.BASE_URL}:${port}/api`);
 });
