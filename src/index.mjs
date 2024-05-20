@@ -1,52 +1,51 @@
 import express from 'express';
 
+import multer from 'multer';
+import mongoose from 'mongoose';
+import MongoStore from 'connect-mongo';
+import session from 'express-session';
+import passport from 'passport';
+import dotenv from 'dotenv';
+import routes from './router/index.mjs';
+import { API_PREFIX } from './utils/constant.mjs';
+import cookieParser from 'cookie-parser';
+
+dotenv.config();
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
-const users = [
-    {id:1, name: 'John Doe', age: 25},
-    {id:2, name: 'Jane Doe', age: 24},
-    {id:3, name: 'John Smith', age: 30},
-    {id:4, name: 'Jane Smith', age: 29},
-    {id:5, name: 'Marry Doe', age: 22},
-    {id:6, name: 'Marry Smith', age: 26},
-];
+mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`)
+    .then(() => console.log('connected to database'))
+    .catch(err => console.log(err).status(500));
 
-app.get('/api', (req, res) => {
-   res.status(200).send({ 
-        message: 'Hello this is daily expense api'});
-    });
+const loggingMiddleware = (req, res, next) => {
+    console.log(`${req.method} ${req.path} | ${req.ip} | ${new Date().toISOString()} | ${req.get('user-agent')}`);
+    next();
+}
 
-app.get('/api/users', (req, res) => {
-    console.log(req.params);
-    res.status(200).send({
-        message: 'success get all users',
-        data: users
-    });
-});
+app.use(multer().none());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        saveUninitialized: false,
+        resave: true,
+        cookie: {
+            maxAge: 60000 * 60 * 24,
+        },
+        store: MongoStore.create({
+            client: mongoose.connection.getClient(),
+        }),
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get('/api/users/:id', (req, res) => {
-    const parsedId = parseInt(req.params.id);
-    if (isNaN(parsedId)) {
-        res.status(400).send({
-            message: 'invalid id'
-        });
-        return;
-    }
-    
-    const user = users.find(user => user.id == parsedId);
-    if(!user) {
-        res.status(404).json({
-            message: 'user not found'
-        });
-        return;
-    }
-    res.status(200).json({
-        message: 'success get user by id',
-        data: user
-    });
-});
+app.use(loggingMiddleware);
+app.use(`${API_PREFIX}`, routes);
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`listening at ${process.env.BASE_URL}:${port}`);
 });
