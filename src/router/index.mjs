@@ -1,10 +1,13 @@
 import { Router } from "express";
-import usersRouter from "./users.mjs";
 import categoryRouter from "./categories.mjs";
 import expenseRouter from "./expenses.mjs";
 import '../strategy/localStrategy.mjs';
 import '../strategy/googleStrategy.mjs';
 import passport from "passport";
+import { logger } from '../utils/middleware.mjs';
+import dotenv from 'dotenv';
+
+dotenv.config();
 const routes = Router();
 routes.get('/', (req, res) => {
     return res.status(200).json({
@@ -26,6 +29,7 @@ routes.post('/auth', (req, res) => {
             if (err) {
                 return res.status(500).json({ message: 'An error occurred during login' });
             }
+            logger.info(`Received ${req.method} ${req.url} | ${req.ip} | ${req.get('user-agent')} `);
             user.password = undefined;
             req.session.user = user;
             return res.status(200).json({ message: 'Login successful', user });
@@ -37,8 +41,7 @@ routes.get('/login', (req, res) => {
     res.send('<a href="auth/google"> Login with Google </a>');
 });
 
-routes.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] })
-);
+routes.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
 // Callback route that Google will redirect to after authentication
 routes.get('/auth/google/callback',
@@ -48,7 +51,7 @@ routes.get('/auth/google/callback',
             if (err) {
                 return res.status(500).json({ message: 'An error occurred during login' });
             }
-
+            logger.info(`Received ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
             req.session.user = req.user;
             return res.redirect(`${process.env.BASE_URL}:${process.env.PORT}/api/auth/status`);
         });
@@ -56,20 +59,28 @@ routes.get('/auth/google/callback',
 );
 
 routes.get('auth/failure', (req, res) => {
+    logger.error(`Received ${req.method} ${req.url} | ${req.ip} | ${req.get('user-agent')} `);
     return res.status(401).json({ message: 'Authentication failed' });
 });
 
 routes.post('/auth/logout', (req, res) => {
+    logger.info(`Received ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
     req.session.destroy();
     return res.status(200).json({ message: 'Logged out' });
 });
 
 routes.get('/auth/status', (req, res) => {
-    return req.session.user ? res.status(200).json({
-        message: 'Login successful', user: req.user
-    }) : res.status(401).json({
-        message: 'Unauthorized'
-    });
+    if (req.session.user) {
+        logger.info(`Received ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
+        return res.status(200).json({
+            message: 'Login successful', user: req.user
+        });
+    } else {
+        logger.error(`Failed on ${req.method} ${req.url} | ${req.ip} | ${req.get('user-agent')} `);
+        return res.status(401).json({
+            message: 'Unauthorized'
+        });
+    }
 });
 
 //all routes here

@@ -10,6 +10,7 @@ import routes from './router/index.mjs';
 import cookieParser from 'cookie-parser';
 import { loggingMiddleware } from './utils/middleware.mjs';
 
+
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
