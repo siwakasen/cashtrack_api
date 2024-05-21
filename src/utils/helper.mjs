@@ -10,3 +10,10 @@ export const hashPassword = async (password) => {
 export const comparePassword = async (password, hashedPassword) => {
     return bcrypt.compare(password, hashedPassword);
 };
+
+export const formatValidationErrors = (errors) => {
+    return errors.array().reduce((acc, error) => {
+        acc[error.path] = error.msg;
+        return acc;
+    }, {});
+};

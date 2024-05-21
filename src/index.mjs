@@ -8,6 +8,7 @@ import passport from 'passport';
 import dotenv from 'dotenv';
 import routes from './router/index.mjs';
 import cookieParser from 'cookie-parser';
+import { loggingMiddleware } from './utils/middleware.mjs';
 
 dotenv.config();
 const app = express();
@@ -15,12 +16,9 @@ const port = process.env.PORT;
 
 mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`)
     .then(() => console.log('connected to database'))
-    .catch(err => console.log(err).status(500));
+    .catch(err => console.log(err));
 
-const loggingMiddleware = (req, res, next) => {
-    console.log(`${req.method} ${req.path} | ${req.ip} | ${new Date().toISOString()} | ${req.get('user-agent')}`);
-    next();
-}
+
 
 app.use(multer().none());
 app.use(express.json());

@@ -1,18 +1,23 @@
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 
-CategorySchema = new Schema({
+const categorySchema = new mongoose.Schema({
     category_name: {
-        type: Schema.Types.String,
+        type: mongoose.Schema.Types.String,
         required: true,
     },
+    created_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null,
+    },
     created_at: {
-        type: Schema.Types.Date,
+        type: mongoose.Schema.Types.Date,
         default: Date.now,
     },
     updated_at: {
-        type: Schema.Types.Date,
+        type: mongoose.Schema.Types.Date,
         default: Date.now,
     },
 });
 
-export const Category = mongoose.model('Category', CategorySchema);
+export const Category = mongoose.model('Category', categorySchema);

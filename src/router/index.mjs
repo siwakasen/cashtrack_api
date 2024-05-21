@@ -1,5 +1,7 @@
 import { Router } from "express";
 import usersRouter from "./users.mjs";
+import categoryRouter from "./categories.mjs";
+import expenseRouter from "./expenses.mjs";
 import '../strategy/localStrategy.mjs';
 import '../strategy/googleStrategy.mjs';
 import passport from "passport";
@@ -64,14 +66,14 @@ routes.post('/auth/logout', (req, res) => {
 
 routes.get('/auth/status', (req, res) => {
     return req.session.user ? res.status(200).json({
-        message: 'Login successful', user: req.user, session: req.session.user
+        message: 'Login successful', user: req.user
     }) : res.status(401).json({
         message: 'Unauthorized'
     });
 });
 
 //all routes here
-routes.use('/users', usersRouter);
-
+routes.use('/categories', categoryRouter);
+routes.use('/expenses', expenseRouter);
 
 export default routes;

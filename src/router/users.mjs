@@ -2,24 +2,10 @@ import { Router } from 'express';
 import { checkSchema, validationResult } from 'express-validator';
 import { User } from '../mongoose/schemas/userSchema.mjs';
 import { createUserSchema, updateUserSchema } from '../utils/validations.mjs';
-import { hashPassword } from '../utils/helper.mjs';
+import { hashPassword, formatValidationErrors } from '../utils/helper.mjs';
+import { isLoggedin } from '../utils/middleware.mjs';
+
 const router = Router();
-
-const isLoggedin = (req, res, next) => {
-    if (!req.session.user) {
-        return res.status(401).json({
-            message: 'Not Authenticated'
-        });
-    }
-    next();
-};
-
-const formatValidationErrors = (errors) => {
-    return errors.array().reduce((acc, error) => {
-        acc[error.path] = error.msg;
-        return acc;
-    }, {});
-};
 
 //GET
 router.get('/', isLoggedin, async (req, res) => {
