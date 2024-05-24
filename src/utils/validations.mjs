@@ -57,6 +57,17 @@ export const createCategorySchema = {
             errorMessage: 'Name must be less than 50 characters',
         },
     },
+    icon: {
+        notEmpty: {
+            errorMessage: 'Icon is required',
+        },
+        isLength: {
+            options: {
+                max: 50,
+            },
+            errorMessage: 'Icon must be less than 5 characters',
+        },
+    },
 };
 
 export const createExpenseSchema = {
@@ -82,12 +93,6 @@ export const createExpenseSchema = {
                 max: 100,
             },
             errorMessage: 'Name must be less than 50 characters',
-        },
-    },
-    date_of_expense: {
-        optional: true,
-        isDate: {
-            errorMessage: 'Invalid date',
         },
     },
     category_id: {

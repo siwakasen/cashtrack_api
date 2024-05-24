@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const expenseSchema = new mongoose.Schema({
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     },
     amount: {
@@ -15,6 +16,7 @@ const expenseSchema = new mongoose.Schema({
     },
     category_id: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
         required: true,
     },
     date_of_expense: {

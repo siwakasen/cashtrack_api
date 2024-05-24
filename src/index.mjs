@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import routes from './router/index.mjs';
 import cookieParser from 'cookie-parser';
 import { loggingMiddleware } from './utils/middleware.mjs';
-
+import cors from 'cors';
 
 dotenv.config();
 const app = express();
@@ -33,13 +33,19 @@ app.use(multer().none());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+}));
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
         saveUninitialized: false,
         resave: true,
         cookie: {
+            httpOnly: true,
             maxAge: 60000 * 60 * 24,
+            sameSite: 'none',
         },
         store: MongoStore.create({
             client: mongoose.connection.getClient(),

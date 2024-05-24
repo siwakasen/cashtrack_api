@@ -5,12 +5,72 @@ import { Category } from '../mongoose/schemas/categorySchema.mjs';
 import { createExpenseSchema, updateExpenseSchema } from '../utils/validations.mjs';
 import { formatValidationErrors } from '../utils/helper.mjs';
 import { isLoggedin, logger } from '../utils/middleware.mjs';
-
+import moment from 'moment-timezone';
 const router = Router();
 const url = '/api/expenses';
+const getCurrentMonthDateRange = () => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return { startOfMonth, endOfMonth };
+};
+
+const { startOfMonth, endOfMonth } = getCurrentMonthDateRange();
+
+//get current month expenses
 router.get('/', isLoggedin, async (req, res) => {
     try {
-        const expenses = await Expense.find({ user_id: req.user._id });
+        const expenses = await Expense.find({ user_id: req.user._id, date_of_expense: { $gte: startOfMonth, $lte: endOfMonth } })
+            .populate('category_id')
+            .sort({ date_of_expense: 'desc' });
+
+        if (expenses.length === 0) {
+            logger.error(`Received ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
+            return res.status(404).json({
+                message: 'expense not found',
+                data: [],
+            });
+        }
+
+        const groupedExpenses = expenses.reduce((acc, expense) => {
+            const date = expense.date_of_expense.toISOString().split('T')[0]; // Extract date part in local timezone
+            if (!acc[date]) {
+                acc[date] = { data_expenses: [], total_expense: 0 };
+            }
+            acc[date].data_expenses.push(expense);
+            acc[date].total_expense += expense.amount;
+            return acc;
+        }, {});
+
+        const data = Object.keys(groupedExpenses).map(date => ({
+            date_of_expenses: date,
+            total_expense: groupedExpenses[date].total_expense,
+            data_expenses: groupedExpenses[date].data_expenses.sort((a, b) => new Date(b.date_of_expense) - new Date(a.date_of_expense))
+        }));
+
+        logger.info(`Received ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
+        return res.status(200).json({
+            message: 'success get all expenses',
+            data: data
+        });
+    } catch (error) {
+        logger.error(`Received ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
+        return res.status(500).json({
+            message: 'error get all expenses',
+            error: error.message
+        });
+    }
+});
+
+router.get('/month/:month', isLoggedin, async (req, res) => {
+    const month = parseInt(req.params.month);
+    const year = new Date().getFullYear();
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 1);
+    try {
+        const expenses = await Expense.find({ user_id: req.user._id, date_of_expense: { $gte: startOfMonth, $lt: endOfMonth } })
+            .populate('category_id')
+            .sort({ date_of_expense: 'asc' });
         if (expenses.length === 0) {
             logger.error(`Received ${req.method} ${url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
             return res.status(404).json({
@@ -31,6 +91,7 @@ router.get('/', isLoggedin, async (req, res) => {
     }
 });
 
+//get expense by id
 router.get('/:id', isLoggedin, async (req, res) => {
     try {
         const expense = await Expense.findOne({ _id: req.params.id, user_id: req.user._id });

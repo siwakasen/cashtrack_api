@@ -2,7 +2,6 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { User } from "../mongoose/schemas/userSchema.mjs";
 import dotenv from 'dotenv';
-
 dotenv.config();
 export default passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -11,12 +10,11 @@ export default passport.use(new GoogleStrategy({
     scope: ['email', 'profile']
 },
     (accessToken, refreshToken, profile, done) => {
-        const { id, displayName, emails } = profile;
+        const { displayName, emails } = profile;
         const email = emails && emails.length > 0 ? emails[0].value : null;
         User.findOne({ email: email }).then(async (user) => {
             if (!user) {
                 user = new User({
-                    googleId: id,
                     name: displayName,
                     email: email
                 });
