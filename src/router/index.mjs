@@ -16,26 +16,6 @@ routes.get('/', (req, res) => {
 });
 
 
-// FOR LOCAL STRATEGY / LOGIN ON API
-routes.post('/auth', (req, res) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            return res.status(500).json({ message: err.message });
-        }
-        if (!user) {
-            return res.status(401).json({ message: info.message });
-        }
-        req.logIn(user, (err) => {
-            if (err) {
-                return res.status(500).json({ message: 'An error occurred during login' });
-            }
-            logger.info(`Received ${req.method} ${req.url} | ${req.ip} | ${req.get('user-agent')} `);
-            user.password = undefined;
-            req.session.user = user;
-            return res.status(200).json({ message: 'Login successful', result: req.session.user });
-        });
-    })(req, res);
-});
 
 
 routes.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
