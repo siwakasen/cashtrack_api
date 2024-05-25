@@ -21,6 +21,7 @@ const port = process.env.PORT;
 //     .catch(err => console.log(err));
 
 //connect to mongodb atlas
+
 mongoose.connect(process.env.DB_CONNECTION_STRING, {
 }).then(() => {
     console.log('Connected to MongoDB Atlas');
@@ -46,6 +47,7 @@ app.use(
             httpOnly: true,
             maxAge: 60000 * 60 * 24,
             sameSite: 'none',
+            secure: true,
         },
         store: MongoStore.create({
             client: mongoose.connection.getClient(),

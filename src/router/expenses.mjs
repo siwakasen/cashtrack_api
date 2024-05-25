@@ -33,7 +33,7 @@ router.get('/', isLoggedin, async (req, res) => {
         }
 
         const groupedExpenses = expenses.reduce((acc, expense) => {
-            const date = expense.date_of_expense.toISOString().split('T')[0]; // Extract date part in local timezone
+            const date = expense.date_of_expense.toISOString().split('T')[0];
             if (!acc[date]) {
                 acc[date] = { data_expenses: [], total_expense: 0 };
             }
