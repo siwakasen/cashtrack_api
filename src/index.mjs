@@ -10,6 +10,7 @@ import routes from './router/index.mjs';
 import cookieParser from 'cookie-parser';
 import { loggingMiddleware } from './utils/middleware.mjs';
 import cors from 'cors';
+import path from 'path';
 
 dotenv.config();
 const app = express();
@@ -61,5 +62,5 @@ app.use(loggingMiddleware);
 app.use(`/api`, routes);
 
 app.listen(port, () => {
-    console.log(`listening at ${process.env.BASE_URL}:${port}/api`);
+    console.log(`listening at port:${port}`);
 });
