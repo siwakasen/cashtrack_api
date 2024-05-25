@@ -6,6 +6,7 @@ import { createExpenseSchema, updateExpenseSchema } from '../utils/validations.m
 import { formatValidationErrors } from '../utils/helper.mjs';
 import { isLoggedin, logger } from '../utils/middleware.mjs';
 const url = '/api/expenses';
+const router = Router();
 const getCurrentMonthDateRange = () => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
