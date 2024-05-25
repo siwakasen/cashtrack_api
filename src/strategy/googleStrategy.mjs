@@ -9,7 +9,7 @@ export default passport.use(new GoogleStrategy({
     callbackURL: `${process.env.CALLBACK_URL}`,
     scope: ['email', 'profile']
 },
-    (accessToken, refreshToken, profile, done) => {
+    (accessToken, refreshToken, profile, cb) => {
         const { displayName, emails } = profile;
         const email = emails && emails.length > 0 ? emails[0].value : null;
         User.findOne({ email: email }).then(async (user) => {
@@ -28,9 +28,9 @@ export default passport.use(new GoogleStrategy({
                 }
                 await user.save();
             }
-            done(null, user);
+            cb(null, user);
         }).catch((err) => {
-            done(err, null);
+            cb(err, null);
         });
     }
 ));
