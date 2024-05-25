@@ -16,13 +16,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
-//connect to localhost mongodb
-// mongoose.connect(`mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`)
-//     .then(() => console.log('connected to database'))
-//     .catch(err => console.log(err));
-
-//connect to mongodb atlas
-
 mongoose.connect(process.env.DB_CONNECTION_STRING, {
 }).then(() => {
     console.log('Connected to MongoDB Atlas');

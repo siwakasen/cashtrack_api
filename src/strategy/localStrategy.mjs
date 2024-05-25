@@ -1,7 +1,6 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
 import { User } from "../mongoose/schemas/userSchema.mjs";
-import { comparePassword } from "../utils/helper.mjs";
 
 passport.deserializeUser(async (id, done) => {
     try {

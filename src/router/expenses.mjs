@@ -5,8 +5,6 @@ import { Category } from '../mongoose/schemas/categorySchema.mjs';
 import { createExpenseSchema, updateExpenseSchema } from '../utils/validations.mjs';
 import { formatValidationErrors } from '../utils/helper.mjs';
 import { isLoggedin, logger } from '../utils/middleware.mjs';
-import moment from 'moment-timezone';
-const router = Router();
 const url = '/api/expenses';
 const getCurrentMonthDateRange = () => {
     const now = new Date();

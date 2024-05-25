@@ -1,6 +1,5 @@
 import winston from 'winston';
 
-
 export const loggingMiddleware = (req, res, next) => {
     if (req.user) {
         logger.info(`Requesting ${req.method} ${req.url} | ${req.ip} | ${req.user._id} | ${req.get('user-agent')} `);
