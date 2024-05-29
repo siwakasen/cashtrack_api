@@ -4,14 +4,11 @@ import multer from 'multer';
 import mongoose from 'mongoose';
 import MongoStore from 'connect-mongo';
 import session from 'express-session';
-import passport from 'passport';
 import dotenv from 'dotenv';
 import routes from './router/index.mjs';
 import cookieParser from 'cookie-parser';
 import { loggingMiddleware } from './utils/middleware.mjs';
 import cors from 'cors';
-import path from 'path';
-
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
@@ -29,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL, // Set the origin to your frontend URL
     credentials: true,
 }));
 app.use(
@@ -37,19 +34,12 @@ app.use(
         secret: process.env.SESSION_SECRET,
         saveUninitialized: false,
         resave: true,
-        cookie: {
-            httpOnly: true,
-            maxAge: 60000 * 60 * 24,
-            sameSite: 'none',
-            secure: true,
-        },
         store: MongoStore.create({
             client: mongoose.connection.getClient(),
         }),
+        cookie: { secure: false }
     })
 );
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(loggingMiddleware);
 app.use(`/api`, routes);

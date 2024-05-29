@@ -16,7 +16,9 @@ export default passport.use(new GoogleStrategy({
             if (!user) {
                 user = new User({
                     name: displayName,
-                    email: email
+                    email: email,
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
                 });
                 await user.save();
             } else {

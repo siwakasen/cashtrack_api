@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
             errorMessage: 'Invalid email',
         },
     },
+    image: {
+        type: mongoose.Schema.Types.String,
+        required: false,
+    },
     created_at: {
         type: mongoose.Schema.Types.Date,
         default: Date.now,
