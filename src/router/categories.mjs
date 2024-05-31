@@ -3,13 +3,13 @@ import { checkSchema, validationResult } from 'express-validator';
 import { Category } from '../mongoose/schemas/categorySchema.mjs';
 import { createCategorySchema } from '../utils/validations.mjs';
 import { formatValidationErrors } from '../utils/helper.mjs';
-import { isLoggedin, logger } from '../utils/middleware.mjs';
+import { logger } from '../utils/middleware.mjs';
 
 const router = Router();
 const url = '/api/categories';
-router.get('/', isLoggedin, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const categories = await Category.find({ $or: [{ created_by: req.user._id }, { created_by: null }] });
+        const categories = await Category.find({ $or: [{ created_by: null }, { created_by: null }] });
         if (categories.length === 0) {
             return res.status(404).json({
                 message: 'category not found',
@@ -22,12 +22,13 @@ router.get('/', isLoggedin, async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'error get all categories'
+            message: 'error get all categories',
+            data: [],
         });
     }
 });
 
-router.get('/:id', isLoggedin, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const category = await Category.findOne({ _id: req.params.id, $or: [{ created_by: req.user._id }, { created_by: null }] });
         if (!category) {
@@ -42,12 +43,13 @@ router.get('/:id', isLoggedin, async (req, res) => {
         });
     } catch (error) {
         return res.status(500).json({
-            message: 'error get category by id'
+            message: 'error get category by id',
+            data: [],
         });
     }
 });
 
-router.post('/', isLoggedin, checkSchema(createCategorySchema), async (req, res) => {
+router.post('/', checkSchema(createCategorySchema), async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({
@@ -69,7 +71,8 @@ router.post('/', isLoggedin, checkSchema(createCategorySchema), async (req, res)
         });
     } catch (err) {
         return res.status(500).json({
-            message: 'error create category'
+            message: 'error create category',
+            data: [],
         });
     }
 });
