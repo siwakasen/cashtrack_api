@@ -1,10 +1,10 @@
 import winston from 'winston';
 import { User } from '../mongoose/schemas/userSchema.mjs';
 import jwt from 'jsonwebtoken';
+
 export const loggingMiddleware = async (req, res, next) => {
-
+    logger.info(`Requesting... ${req.method} ${req.url} ${req.ip} ${req.user._id} ${req.headers['user-agent']}`);
     console.log(`${req.method} ${req.url}`);
-
     next();
 }
 
@@ -16,7 +16,6 @@ export const verifyToken = async (req, res, next) => {
     });
 
     try {
-        console.log(token);
         const decoded = jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
         req.user = decoded;
         const user = await User.findOne({ email: req.user.id });

@@ -1,10 +1,9 @@
 import { Router } from "express";
 import categoryRouter from "./categories.mjs";
 import expenseRouter from "./expenses.mjs";
-import { logger } from '../utils/middleware.mjs';
 import dotenv from 'dotenv';
 import { User } from '../mongoose/schemas/userSchema.mjs';
-import { verifyToken } from '../utils/middleware.mjs';
+import { loggingMiddleware, verifyToken } from '../utils/middleware.mjs';
 dotenv.config();
 const routes = Router();
 routes.get('/', (req, res) => {
@@ -29,7 +28,7 @@ routes.post('/auth/login', async (req, res) => {
 
 
 //all routes here
-routes.use('/categories', verifyToken, categoryRouter);
-routes.use('/expenses', verifyToken, expenseRouter);
+routes.use('/categories', verifyToken, loggingMiddleware, categoryRouter);
+routes.use('/expenses', verifyToken, loggingMiddleware, expenseRouter);
 
 export default routes;

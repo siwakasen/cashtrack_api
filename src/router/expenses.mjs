@@ -63,8 +63,9 @@ router.get('/', async (req, res) => {
 router.get('/month/:month', async (req, res) => {
     const month = parseInt(req.params.month);
     const year = new Date().getFullYear();
-    const startOfMonth = new Date(year, month - 1, 1);
-    const endOfMonth = new Date(year, month, 1);
+    const startOfMonth = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+    const endOfMonth = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59));
+    console.log(startOfMonth, endOfMonth);
     try {
         const expenses = await Expense.find({ user_id: req.user._id, date_of_expense: { $gte: startOfMonth, $lt: endOfMonth } })
             .populate('category_id')

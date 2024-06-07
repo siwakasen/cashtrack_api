@@ -37,7 +37,6 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(setCorsHeaders);
 app.use(express.json());
-app.use(loggingMiddleware);
 app.use(`/api`, routes);
 
 app.listen(port, () => {
