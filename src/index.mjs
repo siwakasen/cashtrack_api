@@ -8,9 +8,10 @@ import dotenv from 'dotenv';
 import routes from './router/index.mjs';
 import cookieParser from 'cookie-parser';
 import { loggingMiddleware } from './utils/middleware.mjs';
-
+import { Router } from 'express';
 import cors from 'cors';
 dotenv.config();
+const router = Router();
 const app = express();
 const port = process.env.PORT;
 const corsOptions = {
@@ -37,6 +38,13 @@ app.use(cookieParser());
 app.use(cors(corsOptions));
 app.use(setCorsHeaders);
 app.use(express.json());
+
+routes.get('/', (req, res) => {
+    return res.status(200).json({
+        message: 'Hello this is CashTrack API',
+    });
+});
+
 app.use(`/api`, routes);
 
 app.listen(port, () => {

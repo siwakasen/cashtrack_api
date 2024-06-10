@@ -6,11 +6,7 @@ import { User } from '../mongoose/schemas/userSchema.mjs';
 import { loggingMiddleware, verifyToken } from '../utils/middleware.mjs';
 dotenv.config();
 const routes = Router();
-routes.get('/', (req, res) => {
-    return res.status(200).json({
-        message: 'Hello this is CashTrack API',
-    });
-});
+
 
 routes.post('/auth/login', async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
